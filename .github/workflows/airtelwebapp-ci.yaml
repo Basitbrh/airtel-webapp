@@ -20,7 +20,6 @@ jobs:
             whoami 
             docker -v 
             docker-compose version 
-        - name: now using compose to build and create 
           - name: Build and create Docker containers
         run: |
           docker-compose down
