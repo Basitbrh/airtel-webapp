@@ -4,7 +4,8 @@ name: ashu docker image pipeline
 # When to run this job
 on:
   push:
-    branches: ["master"]
+    branches:
+      - master
 
 # Define the jobs
 jobs:
@@ -13,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
 
       - name: Check system information
         run: |
@@ -25,10 +26,11 @@ jobs:
 
       - name: Build and create Docker containers
         run: |
-          docker-compose down &>/dev/null
-          docker-compose up  --build
-          sleep 2
+          docker-compose down --remove-orphans
+          docker-compose up --build -d
+          sleep 10
           docker-compose ps
+
 
       - name: Test container health
         run: |
