@@ -1,51 +1,46 @@
-# Name of the pipeline
-name: ashu docker image pipeline
+# name of pipeline 
+name: ashu docker image pipeline 
+# when to run this job 
+on: 
+    push:
+        branches: ["master"]
+# now we can write jobs 
+jobs: 
+    # name of first job 
+    ashucode-check-build:
+        runs-on: ubuntu-latest 
+        steps: 
+        - name: default action in github to check my repo if there is a change
+          uses: actions/checkout@v4
+          # fix action by git to check your repo for a change 
+        - name: i want to check few things 
+          run: | 
+            date 
+            ls -a
+            whoami 
+            docker -v 
+            docker-compose version 
+        - name: now using compose to build and create 
+          run: | 
+            docker-compose down &>/dev/null
+            docker-compose up -d --build 
+            sleep 2
+            docker-compose ps 
+    
+        - name: trying to access container created in previous step 
+          run: |
+            curl -f http://localhost:1244/health.html 
+            echo "seems like my container is running"
 
-# When to run this job
-on:
-  push:
-    branches:
-      - master
-
-# Define the jobs
-jobs:
-  # Name of the first job
-  ashucode-check-build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Check system information
-        run: |
-          date
-          ls -a
-          whoami
-          docker -v
-          docker-compose version
-
-      - name: Build and create Docker containers
-        run: |
-          docker-compose down --remove-orphans
-          docker-compose up --build -d
-          sleep 10
-          docker-compose ps
-
-
-      - name: Test container health
-        run: |
-          curl -f http://localhost:1244/health.html
-          echo "Container appears to be running"
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: dockerashu/ashuweb:version1
+        - name: image push to docker hub 
+          uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+          with:
+            username: ${{secrets.DOCKER_USERNAME}}
+            password: ${{secrets.DOCKERHUB_TOKEN}} 
+        
+        - name: build and push image 
+          uses: docker/build-push-action@v5
+          with: 
+            context: .
+            push: true
+            tags: dockerashu/ashuweb:version1
